@@ -22,7 +22,7 @@ import com.smxy.common.utils.R;
  *
  * @author Johnny-Kang
  * @email Johnny-Kang@gmail.com
- * @date 2022-08-15 10:55:46
+ * @date 2022-08-15 16:06:32
  */
 @RestController
 @RequestMapping("product/spuinfo")
@@ -34,6 +34,7 @@ public class SpuInfoController {
      * 列表
      */
     @RequestMapping("/list")
+    //@RequiresPermissions("product:spuinfo:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = spuInfoService.queryPage(params);
 
@@ -45,6 +46,7 @@ public class SpuInfoController {
      * 信息
      */
     @RequestMapping("/info/{id}")
+    //@RequiresPermissions("product:spuinfo:info")
     public R info(@PathVariable("id") Long id){
 		SpuInfoEntity spuInfo = spuInfoService.getById(id);
 
@@ -55,6 +57,7 @@ public class SpuInfoController {
      * 保存
      */
     @RequestMapping("/save")
+    //@RequiresPermissions("product:spuinfo:save")
     public R save(@RequestBody SpuInfoEntity spuInfo){
 		spuInfoService.save(spuInfo);
 
@@ -65,6 +68,7 @@ public class SpuInfoController {
      * 修改
      */
     @RequestMapping("/update")
+    //@RequiresPermissions("product:spuinfo:update")
     public R update(@RequestBody SpuInfoEntity spuInfo){
 		spuInfoService.updateById(spuInfo);
 
@@ -75,6 +79,7 @@ public class SpuInfoController {
      * 删除
      */
     @RequestMapping("/delete")
+    //@RequiresPermissions("product:spuinfo:delete")
     public R delete(@RequestBody Long[] ids){
 		spuInfoService.removeByIds(Arrays.asList(ids));
 

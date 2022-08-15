@@ -12,7 +12,7 @@ import lombok.Data;
  * 
  * @author Johnny-Kang
  * @email Johnny-Kang@gmail.com
- * @date 2022-08-15 10:55:46
+ * @date 2022-08-15 16:01:37
  */
 @Data
 @TableName("pms_spu_images")
