@@ -2,13 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- project信息 -->
+    <!-- 自定义 Parent -->
     <groupId>com.smxy.gulimall</groupId>
     <artifactId>gulimall</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+
     <name>gulimall</name>
     <description>聚合服务</description>
+    <!--父工程默认的打包方式pom方式-->
     <packaging>pom</packaging>
 
+    <!-- 子模块 -->
     <modules>
         <module>gulimall-product</module>
         <module>gulimall-coupon</module>
@@ -19,4 +25,50 @@
         <module>renren-generator</module>
         <module>gulimall-common</module>
     </modules>
+
+    <!-- 继承 Spring Boot -->
+    <!-- Spring Boot Version | 2.3.12.RELEASE -->
+    <!-- Spring Cloud Version | Spring Cloud Hoxton.SR12 -->
+    <!-- Spring Cloud Alibaba Version | 2.2.8.RELEASE -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.12.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <!-- 相关属性、第三方依赖版本号 -->
+    <properties>
+        <!--全局配置参数-->
+        <java.version>1.8</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Spring Cloud Version | Hoxton.SR12 -->
+        <spring-cloud.version>Hoxton.SR12</spring-cloud.version>
+        <!-- Spring Cloud Alibaba Version | 2.2.8.RELEASE -->
+        <spring-cloud-alibaba.version>2.2.8.RELEASE</spring-cloud-alibaba.version>
+    </properties>
+
+    <!--dependencyManagement元素用于定义核心依赖的管理,例如依赖的版本-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
