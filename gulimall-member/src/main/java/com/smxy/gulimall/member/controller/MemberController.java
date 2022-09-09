@@ -3,6 +3,7 @@ package com.smxy.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.smxy.gulimall.member.feign.MemberCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +30,22 @@ import com.smxy.common.utils.R;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private MemberCouponService memberCouponService;
+
+    /**
+     * openFeign测试接口
+     */
+    @RequestMapping("/coupons")
+    public R test() {
+        MemberEntity entity = new MemberEntity();
+        entity.setNickname("张三");
+
+        R membercoupons = memberCouponService.memberCoupons();
+        Object coupons = membercoupons.get("memberCoupons");
+        return R.ok().put("member", entity).put("coupons", coupons);
+    }
 
     /**
      * 列表
