@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: gulimall-coupon
   cloud:
@@ -8,3 +10,11 @@ spring:
         file-extension: yaml
         refresh-enabled: true
         namespace: 00ef908f-1c6f-46a8-9074-dd4b5dfc4f22
+        shared-configs:
+          - data-id: datasource.yaml
+            group: COMMON_GROUP
+          - data-id: mybatis.yaml
+            group: COMMON_GROUP
+          - data-id: base.yaml
+            group: COMMON_GROUP
+

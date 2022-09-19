@@ -1,0 +1,15 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        refresh-enabled: true
+        server-addr: 121.5.207.158:8848
+        namespace: 00ef908f-1c6f-46a8-9074-dd4b5dfc4f22
+        shared-configs:
+          - data-id: gateway.yaml
+            group: GULIMALL_GATEWAY
+          - data-id: base.yaml
+            group: GULIMALL_GATEWAY
+  application:
+    name: gulimall-gateway

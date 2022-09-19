@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: gulimall-coupon
+  cloud:
+    nacos:
+      config:
+        server-addr: 121.5.207.158:8848
+        file-extension: yaml
+        refresh-enabled: true
+        namespace: 86e906a8-5dfd-43ca-b6d8-aa2302c23d24
