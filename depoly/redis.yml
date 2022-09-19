@@ -1,0 +1,27 @@
+services:
+  #服务名称
+  redis:
+    #docker 镜像名称
+    image: redis
+    #重启docker时，自动启动相关容器
+    restart: always
+    #对应-i
+    stdin_open: true
+    #对应-t
+    tty: true
+    #容器名称
+    container_name: redis
+    #container内的root拥有真正的root权限
+    privileged: true
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - ./redis/data:/data
+      - ./redis/redis.conf:/etc/redis.conf
+    networks:
+      - net-my
+    
+networks:
+  net-my:

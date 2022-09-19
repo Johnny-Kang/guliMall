@@ -1,0 +1,26 @@
+services:
+  nacos:
+    image: nacos/nacos-server:v2.1.0
+    stdin_open: true
+    tty: true
+    privileged: true
+    restart: always
+    container_name: nacos
+
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      
+    environment:
+    - PREFER_HOST_MODE=hostname
+    - MODE=standalone
+    
+    volumes:
+      - ./nacos/logs/:/home/nacos/logs
+      - ./nacos/init.d/custom.properties:/home/nacos/init.d/custom.properties
+    
+    networks:
+      - net-my
+
+networks:
+  net-my:
