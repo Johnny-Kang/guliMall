@@ -11,5 +11,16 @@ spring:
           uri: http://qq.com
           predicates:
             - Query=uri, qq
+
+        - id: admin_route
+          uri: lb://renren-fast
+          predicates:
+            - path=/api/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*), /renren-fast/$\{segment}
+#http://localhost:8080/renren-fast/captcha.jpg?uuid=f719cff8-222a-415e-8df5-fcf2d8a5928a
+#http://localhost:88/api/captcha.jpg?uuid=f719cff8-222a-415e-8df5-fcf2d8a5928a
+
+
 server:
   port: 88
