@@ -19,6 +19,15 @@
           >
             Append
           </el-button>
+
+          <el-button
+              type="text"
+              size="mini"
+              @click="() => update(data)"
+            >
+            update
+          </el-button>
+
           <el-button
             v-if="data.children.length == 0"
             type="text"
@@ -32,7 +41,7 @@
     </el-tree>
 
     <el-dialog
-      title="新增分类"
+      :title="title"
       :visible.sync="dialogVisible"
       width="30%"
       :before-close="handleClose"
@@ -41,10 +50,16 @@
         <el-form-item label="分类名称">
           <el-input v-model="listQuery.name" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="图标">
+          <el-input v-model="listQuery.icon" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="计数单位">
+          <el-input v-model="listQuery.productUnit" autocomplete="off"></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addMenu">确 定</el-button>
+        <el-button type="primary" @click="addAndUpdateMenu">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -59,8 +74,13 @@ export default {
         parentCid: 0,
         catLevel: 0,
         showStatus: 1,
-        sort: 0
+        sort: 0,
+        catId:null,
+        productCount:0,
+        icon:null,
+        productUnit:null,
       },
+      title:'',
       dataList: [],
       expandKey: [],
       dialogVisible:false,
@@ -76,18 +96,28 @@ export default {
   methods: {
     handleClose(){
       this.dialogVisible = false
+      this.listQuery
     },
     append(data) {
+      this.title = '添加分类'
       this.dialogVisible = true
       this.listQuery.parentCid = data.catId
       this.listQuery.catLevel = data.catLevel*1+1;
     },
+    update(data){
+      this.title = '修改分类'
+      this.dialogVisible = true
+      this.$nextTick(() => {
+        this.listQuery = {...data}
+        debugger
+      })
+    },
     /**
      * 添加三级分类方法
      */
-    addMenu(){
+    addAndUpdateMenu(){
       this.$http({
-      url: this.$http.adornUrl('/product/category/save'),
+      url: this.$http.adornUrl(`/product/category/${this.listQuery.catId == null?'save':'update'}`),
       method: 'post',
       data: this.$http.adornData(this.listQuery, false)
       }).then(({ data }) => {

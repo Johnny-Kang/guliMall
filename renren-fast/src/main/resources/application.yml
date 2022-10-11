@@ -2,12 +2,13 @@
 server:
   tomcat:
     uri-encoding: UTF-8
-    max-threads: 1000
-    min-spare-threads: 30
-  port: 8080
-  connection-timeout: 5000ms
+    connection-timeout: 5000ms
+    threads:
+      max: 1000
+      min-spare: 30
   servlet:
     context-path: /renren-fast
+  port: 8080
 
 spring:
   # 环境 dev|test|prod
@@ -82,4 +83,3 @@ renren:
     # token有效时长，7天，单位秒
     expire: 604800
     header: token
-
