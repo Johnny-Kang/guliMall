@@ -1,5 +1,8 @@
 <template>
   <div>
+    <el-switch v-model="draggable" active-text="开启拖拽" inactive-text="关闭拖拽"></el-switch>
+    <el-button v-if="draggable" @click="batchSave">批量保存</el-button>
+    <el-button type="danger" @click="batchDelete">批量删除</el-button>
     <el-tree
       :data="dataList"
       :props="defaultProps"
@@ -7,6 +10,9 @@
       :expand-on-click-node="false"
       node-key="catId"
       :default-expanded-keys="expandKey"
+      :draggable="true"
+      :allow-drop="allowDrop"
+      @node-drop="handleDrop"
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -87,16 +93,109 @@ export default {
       defaultProps: {
         children: "children",
         label: "name"
-      }
+      },
+      maxLevel: 0,
+      pCids: [],
+      updateNodes: [],
+      draggable:false
     };
   },
   created() {
     this.getDataList();
   },
   methods: {
+    batchSave(){
+      this.$http({
+        url: this.$http.adornUrl(`/update/sort`),
+        method: 'post',
+        data: this.$http.adornData(this.updateNodes, false)
+      }).then(({ data }) => {
+        this.$message({
+          type: "success",
+          message: "修改成功!"
+        });
+        this.getDataList();
+        this.expandKey = this.pCids;
+      })
+    },
+    batchDelete(){
+
+    },
+    handleDrop(draggingNode, dropNode, dropType, ev) {
+      console.log('tree drop: ', draggingNode, dropNode, dropType);
+
+      let pCid = 0
+      let siblings = null
+      //当前node的最新父节点id
+      if (dropType === 'inner'){
+        pCid = dropNode.data.catId
+        siblings = dropNode.childNodes
+      }else{
+        pCid = dropNode.data.parentCid
+        siblings = dropNode.parent.childNodes
+      }
+      this.pCids.push(pCid)
+
+      //2、当前拖拽节点的最新顺序，
+      for (let i = 0; i < siblings.length; i++) {
+        if (siblings[i].data.catId == draggingNode.data.catId) {
+          //如果遍历的是当前正在拖拽的节点
+          let catLevel = draggingNode.level;
+          if (siblings[i].level != draggingNode.level) {
+            //当前节点的层级发生变化
+            catLevel = siblings[i].level;
+            //修改他子节点的层级
+            this.updateChildNodeLevel(siblings[i]);
+          }
+          this.updateNodes.push({
+            catId: siblings[i].data.catId,
+            sort: i,
+            parentCid: pCid,
+            catLevel: catLevel
+          });
+        } else {
+          this.updateNodes.push({ catId: siblings[i].data.catId, sort: i });
+        }
+      }
+      //当前拖拽节点的最新层级
+
+    },
+    //修改子节点的层级
+    updateChildNodeLevel(node) {
+      if (node.childNodes.length > 0) {
+        for (let i = 0; i < node.childNodes.length; i++) {
+          this.updateNodes.push({
+            catId: node.childNodes[i].data.catId,
+            catLevel: node.childNodes[i].level
+          });
+          this.updateChildNodeLevel(node.childNodes[i]);
+        }
+      }
+    },
+    allowDrop(draggingNode, dropNode, type) {
+      this.countNodeLevel(draggingNode.data)
+      let deep = (this.maxLevel - draggingNode.data.catLevel) + 1
+      if (type === 'inner'){
+        return (deep + dropNode.level) <= 3
+      }else {
+        return (deep +dropNode.parent.level) <= 3
+      }
+    },
+    countNodeLevel(node){
+      if (node.children != null && node.children.length > 0){
+        node.children.forEach(item => {
+          if (item.catLevel > this.maxLevel){
+            this.maxLevel = item.catLevel
+          }
+          this.countNodeLevel(item)
+        })
+      }
+    },
     handleClose(){
       this.dialogVisible = false
-      this.listQuery
+      Object.assign(this.listQuery,this.$options.data().listQuery)
+      this.updateNodes = []
+      this.maxLevel = 0
     },
     append(data) {
       this.title = '添加分类'
@@ -109,7 +208,6 @@ export default {
       this.dialogVisible = true
       this.$nextTick(() => {
         this.listQuery = {...data}
-        debugger
       })
     },
     /**
@@ -137,8 +235,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      })
-        .then(() => {
+      }).then(() => {
           this.$http({
             url: this.$http.adornUrl("/product/category/delete"),
             method: "post",
