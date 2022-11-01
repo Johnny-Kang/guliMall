@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        refresh-enabled: true
+        server-addr: 121.5.207.158:8848
+  application:
+    name: gulimall-product

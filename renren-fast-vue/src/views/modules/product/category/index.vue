@@ -10,9 +10,10 @@
       :expand-on-click-node="false"
       node-key="catId"
       :default-expanded-keys="expandKey"
-      :draggable="true"
+      :draggable="draggable"
       :allow-drop="allowDrop"
       @node-drop="handleDrop"
+      ref="tree"
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -27,10 +28,10 @@
           </el-button>
 
           <el-button
-              type="text"
-              size="mini"
-              @click="() => update(data)"
-            >
+            type="text"
+            size="mini"
+            @click="() => update(data)"
+          >
             update
           </el-button>
 
@@ -81,15 +82,15 @@ export default {
         catLevel: 0,
         showStatus: 1,
         sort: 0,
-        catId:null,
-        productCount:0,
-        icon:null,
-        productUnit:null,
+        catId: null,
+        productCount: 0,
+        icon: null,
+        productUnit: null,
       },
-      title:'',
+      title: '',
       dataList: [],
       expandKey: [],
-      dialogVisible:false,
+      dialogVisible: false,
       defaultProps: {
         children: "children",
         label: "name"
@@ -97,29 +98,49 @@ export default {
       maxLevel: 0,
       pCids: [],
       updateNodes: [],
-      draggable:false
+      draggable: false
     };
   },
   created() {
     this.getDataList();
   },
   methods: {
-    batchSave(){
+    batchSave() {
       this.$http({
-        url: this.$http.adornUrl(`/update/sort`),
+        url: this.$http.adornUrl(`/product/category/update/sort`),
         method: 'post',
         data: this.$http.adornData(this.updateNodes, false)
-      }).then(({ data }) => {
+      }).then(({data}) => {
         this.$message({
           type: "success",
           message: "修改成功!"
         });
         this.getDataList();
         this.expandKey = this.pCids;
+        this.updateNodes = []
+        this.maxLevel = 0
       })
     },
-    batchDelete(){
-
+    batchDelete() {
+      let catIds = []
+      catIds = this.$refs.tree.getCheckedKeys()
+      this.$confirm(`是否批量删除菜单`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl(`/product/category/delete`),
+          method: 'post',
+          data: this.$http.adornData(catIds, false)
+        }).then(({data}) => {
+          this.$message({
+            type: "success",
+            message: "批量删除成功!"
+          });
+          this.getDataList();
+        })
+      }).catch()
     },
     handleDrop(draggingNode, dropNode, dropType, ev) {
       console.log('tree drop: ', draggingNode, dropNode, dropType);
@@ -127,10 +148,10 @@ export default {
       let pCid = 0
       let siblings = null
       //当前node的最新父节点id
-      if (dropType === 'inner'){
+      if (dropType === 'inner') {
         pCid = dropNode.data.catId
         siblings = dropNode.childNodes
-      }else{
+      } else {
         pCid = dropNode.data.parentCid
         siblings = dropNode.parent.childNodes
       }
@@ -154,7 +175,7 @@ export default {
             catLevel: catLevel
           });
         } else {
-          this.updateNodes.push({ catId: siblings[i].data.catId, sort: i });
+          this.updateNodes.push({catId: siblings[i].data.catId, sort: i});
         }
       }
       //当前拖拽节点的最新层级
@@ -173,37 +194,35 @@ export default {
       }
     },
     allowDrop(draggingNode, dropNode, type) {
-      this.countNodeLevel(draggingNode.data)
-      let deep = (this.maxLevel - draggingNode.data.catLevel) + 1
-      if (type === 'inner'){
+      this.countNodeLevel(draggingNode)
+      let deep = Math.abs((this.maxLevel - draggingNode.level)) + 1
+      if (type === 'inner') {
         return (deep + dropNode.level) <= 3
-      }else {
-        return (deep +dropNode.parent.level) <= 3
+      } else {
+        return (deep + dropNode.parent.level) <= 3
       }
     },
-    countNodeLevel(node){
-      if (node.children != null && node.children.length > 0){
-        node.children.forEach(item => {
-          if (item.catLevel > this.maxLevel){
-            this.maxLevel = item.catLevel
+    countNodeLevel(node) {
+      if (node.childNodes != null && node.childNodes.length > 0) {
+        node.childNodes.forEach(item => {
+          if (item.level > this.maxLevel) {
+            this.maxLevel = item.level
           }
           this.countNodeLevel(item)
         })
       }
     },
-    handleClose(){
+    handleClose() {
       this.dialogVisible = false
-      Object.assign(this.listQuery,this.$options.data().listQuery)
-      this.updateNodes = []
-      this.maxLevel = 0
+      Object.assign(this.listQuery, this.$options.data().listQuery)
     },
     append(data) {
       this.title = '添加分类'
       this.dialogVisible = true
       this.listQuery.parentCid = data.catId
-      this.listQuery.catLevel = data.catLevel*1+1;
+      this.listQuery.catLevel = data.catLevel * 1 + 1;
     },
-    update(data){
+    update(data) {
       this.title = '修改分类'
       this.dialogVisible = true
       this.$nextTick(() => {
@@ -213,12 +232,12 @@ export default {
     /**
      * 添加三级分类方法
      */
-    addAndUpdateMenu(){
+    addAndUpdateMenu() {
       this.$http({
-      url: this.$http.adornUrl(`/product/category/${this.listQuery.catId == null?'save':'update'}`),
-      method: 'post',
-      data: this.$http.adornData(this.listQuery, false)
-      }).then(({ data }) => {
+        url: this.$http.adornUrl(`/product/category/${this.listQuery.catId == null ? 'save' : 'update'}`),
+        method: 'post',
+        data: this.$http.adornData(this.listQuery, false)
+      }).then(({data}) => {
         this.$message({
           type: "success",
           message: "新增成功!"
@@ -236,20 +255,21 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl("/product/category/delete"),
-            method: "post",
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            this.$message({
-              type: "success",
-              message: "删除成功!"
-            });
-            this.getDataList();
-            this.expandKey = [node.parent.data.catId];
+        this.$http({
+          url: this.$http.adornUrl("/product/category/delete"),
+          method: "post",
+          data: this.$http.adornData(ids, false)
+        }).then(({data}) => {
+          this.$message({
+            type: "success",
+            message: "删除成功!"
           });
-        })
-        .catch(() => {});
+          this.getDataList();
+          this.expandKey = [node.parent.data.catId];
+        });
+      })
+        .catch(() => {
+        });
     },
     // 获取数据列表
     getDataList() {
@@ -257,7 +277,7 @@ export default {
       this.$http({
         url: this.$http.adornUrl("/product/category/list/tree"),
         method: "get"
-      }).then(({ data }) => {
+      }).then(({data}) => {
         this.dataList = data.data;
         this.dataListLoading = false;
       });
