@@ -14,7 +14,7 @@ spring:
       # 连接将被测试活动的最大时间量
       validation-timeout: 3000
       # 此属性控制池中连接的最长生命周期，值 0 表示无限生命周期，默认 1800000(30 分钟)
-      max-lifetime: 1800000
+      max-lifetime: 120000
       # 连接到数据库时等待的最长时间(秒)
       login-timeout: 5
       # 池中维护的最小空闲连接数
@@ -25,6 +25,11 @@ spring:
     nacos:
       discovery:
         server-addr: 121.5.207.158:8848
+    alicloud:
+      access-key: LTAI5t7AMBqZ8KzarAZfuTgE
+      secret-key: UYkx9C8BQNQ4iiplS6QgAhwsr51ftd
+      oss:
+        endpoint: oss-cn-shanghai.aliyuncs.com
   application:
     name: gulimall-product
 
@@ -45,3 +50,4 @@ server:
 logging:
   level:
     com.smxy.gulimall: debug
+

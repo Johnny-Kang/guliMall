@@ -1,26 +1,32 @@
 spring:
   cloud:
+    nacos:
+      discovery:
+        server-addr: 121.5.207.158:8848
     gateway:
       routes:
-        - id: baidu_route
-          uri: http://www.baidu.com
+        - id: product_route
+          uri: lb://gulimall-product
           predicates:
-            - Query=uri, baidu
+            - Path=/api/product/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
 
-        - id: qq_route
-          uri: http://qq.com
+        - id: thirdparty_route
+          uri: lb://gulimall-third-party
           predicates:
-            - Query=uri, qq
+            - Path=/api/thirdparty/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
 
         - id: admin_route
           uri: lb://renren-fast
           predicates:
-            - path=/api/**
+            - Path=/api/**
           filters:
             - RewritePath=/api/?(?<segment>.*), /renren-fast/$\{segment}
 #http://localhost:8080/renren-fast/captcha.jpg?uuid=f719cff8-222a-415e-8df5-fcf2d8a5928a
 #http://localhost:88/api/captcha.jpg?uuid=f719cff8-222a-415e-8df5-fcf2d8a5928a
-
 
 server:
   port: 88

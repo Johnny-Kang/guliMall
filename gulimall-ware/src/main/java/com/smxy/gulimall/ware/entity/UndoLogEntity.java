@@ -39,7 +39,7 @@ public class UndoLogEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private byte[] rollbackInfo;
+	private byte[] ckInfo;
 	/**
 	 * 
 	 */
